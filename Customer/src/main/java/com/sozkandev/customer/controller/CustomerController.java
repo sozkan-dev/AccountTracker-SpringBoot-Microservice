@@ -43,8 +43,8 @@ public class CustomerController {
 
     @PostMapping("/moneytransfer")
     public ResponseEntity<Long> transferMoney(@RequestParam long fromIban, @RequestParam long toIban, @RequestParam long amount){
-        long transferId = customerService.transferMoney(fromIban, toIban, amount);
-        return new ResponseEntity<>(transferId, HttpStatus.OK);
+        customerService.transferMoney(fromIban, toIban, amount);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

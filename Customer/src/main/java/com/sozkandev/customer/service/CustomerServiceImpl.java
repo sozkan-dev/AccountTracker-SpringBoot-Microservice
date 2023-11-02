@@ -1,6 +1,7 @@
 package com.sozkandev.customer.service;
 
 import com.sozkandev.customer.entity.Customer;
+import com.sozkandev.customer.exception.CustomerCustomException;
 import com.sozkandev.customer.external.client.TransferService;
 import com.sozkandev.customer.external.request.Transfer;
 import com.sozkandev.customer.model.CustomerRequest;
@@ -30,8 +31,6 @@ public class CustomerServiceImpl implements CustomerService {
                                     .name(customerRequest.getName())
                                     .surname(customerRequest.getSurname())
                                     .account(customerRequest.getAccount())
-                                    //.balance(customerRequest.getBalance())
-                                    //.accountType(customerRequest.getAccountType())
                                     .build();
         customerRepository.save(customer);
         log.info("Customer Created!");
@@ -42,7 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse getCustomerById(Long customerId) {
         log.info("Get the customer for customerId: {}", customerId);
         Customer customer = customerRepository.findById(customerId)
-                                              .orElseThrow(() -> new EntityNotFoundException("Customer not found!"));
+                                              .orElseThrow(() -> new CustomerCustomException("CUSTOMER NOT FOUND!", "NOT_FOUND"));
         CustomerResponse customerResponse = new CustomerResponse();
         BeanUtils.copyProperties(customer, customerResponse);
         return customerResponse;
@@ -57,7 +56,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse editCustomerById(Long customerId, CustomerRequest customerRequest) {
         Customer customer = customerRepository.findById(customerId)
-                                              .orElseThrow(() -> new EntityNotFoundException("Customer not found!"));
+                                              .orElseThrow(() -> new CustomerCustomException("CUSTOMER NOT FOUND!", "NOT_FOUND"));
         customer.setName(customerRequest.getName());
         customer.setSurname(customerRequest.getSurname());
         customer.getAccount()
@@ -73,17 +72,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public long transferMoney(long fromIban, long toIban, long amount) {
+    public void transferMoney(long fromIban, long toIban, long amount) {
         Customer c1 = customerRepository.findById(customerRepository.findCustomerIdByIban(fromIban)).orElseThrow();
         log.info("c1 customer: {}", c1.getCustomerId());
         Customer c2 = customerRepository.findById(customerRepository.findCustomerIdByIban(toIban)).orElseThrow();
         log.info("c2 customer: {}", c2.getCustomerId());
-        //Customer c2 = customerRepository.findById(customerRepository.findCustomerIdByIban(toIban)).orElseThrow();
 
-        //Customer c1 = customerRepository.findById(from.getCustomerId()).orElseThrow(() -> new
-        // EntityNotFoundException("Customer Not Found!"));
-        //Customer c2 = customerRepository.findById(to.getCustomerId()).orElseThrow(() -> new EntityNotFoundException
-        // ("Customer not found!"));
         Transfer transfer = Transfer.builder()
                                     .amount(amount)
                                     .fromIban(fromIban)
@@ -98,6 +92,7 @@ public class CustomerServiceImpl implements CustomerService {
                         .getBalance() + amount);
         customerRepository.save(c1);
         customerRepository.save(c2);
-        return 100;
+        log.info("Money Transfer From {} To {} Applied Succesfully!", c1.getCustomerId(), c2.getCustomerId());
+
     }
 }

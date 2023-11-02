@@ -16,7 +16,7 @@ public interface CustomerService {
 
     CustomerResponse editCustomerById(Long customerId, CustomerRequest customerRequest);
 
-    long transferMoney(long fromIban, long toIban, long amount);
+    void transferMoney(long fromIban, long toIban, long amount);
 
 
 }

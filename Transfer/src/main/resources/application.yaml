@@ -5,8 +5,8 @@ server:
 spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:3306/transferdb
-    username: *
-    password: *
+    username: root
+    password: Demo123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
